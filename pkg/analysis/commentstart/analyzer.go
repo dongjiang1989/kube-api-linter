@@ -55,16 +55,15 @@ func newAnalyzer(cfg *Config) *analysis.Analyzer {
 }
 
 // defaultConfig merges the built-in default exclude prefixes with
-// any user-configured prefixes, deduplicating the result.
+// any user-configured prefixes, deduplicating user entries against
+// the defaults and against each other.
 func defaultConfig(cfg *Config) {
-	seen := make(map[string]struct{}, len(defaultExcludePrefixes)+len(cfg.ExcludePrefixes))
 	merged := make([]string, 0, len(defaultExcludePrefixes)+len(cfg.ExcludePrefixes))
+	merged = append(merged, defaultExcludePrefixes...)
 
+	seen := make(map[string]struct{}, len(defaultExcludePrefixes))
 	for _, p := range defaultExcludePrefixes {
-		if _, ok := seen[p]; !ok {
-			merged = append(merged, p)
-			seen[p] = struct{}{}
-		}
+		seen[p] = struct{}{}
 	}
 
 	for _, p := range cfg.ExcludePrefixes {
